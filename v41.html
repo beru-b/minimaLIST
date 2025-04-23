@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>minimaLIST</title>
+    <!-- Updated favicon to just use the arrow -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNTAiPgo8cGF0aCBkPSJNIDEwIDI1IEwgODAgMjUgTSA4MCAyNSBMIDY1IDEwIE0gODAgMjUgTCA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjQiIGZpbGw9Im5vbmUiIC8+Cjwvc3ZnPg==" type="image/svg+xml">
+    <style>
+        :root {
+            --bg-color: #e8ecee;
+            --card-color: #f3f5f6;
+            --text-color: #333;
+            --accent-color: #555;
+            --border-color: #ddd;
+            --wood-color: #8b5a2b;
+            --nav-bg: white;
+            --footer-bg: white;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            /* Changed the background to a gradient matching the provided image */
+            background: linear-gradient(135deg, rgba(240,240,240,1) 0%, rgba(210,220,212,1) 50%, rgba(180,200,185,1) 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+
+        /* Night mode variables */
+        body.night-mode {
+            --bg-color: #2a2a2a;
+            --card-color: #3a3a3a;
+            --text-color: #e0e0e0;
+            --accent-color: #a0a0a0;
+            --border-color: #555;
+            --wood-color: #5a3921;
+            --nav-bg: #222;
+            --footer-bg: #222;
+            background: linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(40,40,40,1) 50%, rgba(30,30,30,1) 100%);
+        }
+
+        nav {
+            background-color: var(--nav-bg);
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .logo {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-image {
+            height: 15px;
+            width: auto;
+        }
+
+        .menu-button {
+            position: absolute;
+            left: 1rem; /* Moved back to original position */
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
+        }
+
+        .menu-button span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background-color: var(--text-color);
+            border-radius: 3px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .sidebar h2 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        /* Added sidebar navigation menu */
+        .sidebar-nav {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-nav a:hover {
+            background-color: var(--bg-color);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Night mode toggle */
+        .night-mode-toggle {
+            display: flex;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #6eb171;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+        }
+
+        .moon-icon, .sun-icon {
+            height: 14px;
+            width: 14px;
+            position: absolute;
+            top: 5px;
+        }
+
+        .moon-icon {
+            right: 5px;
+            fill: #333;
+        }
+
+        .sun-icon {
+            left: 5px;
+            fill: #f9d71c;
+        }
+
+        .auth-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .auth-button:hover {
+            opacity: 0.9;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: none;
+            margin-bottom: 2rem;
+        }
+
+        .user-info.active {
+            display: block;
+        }
+
+        .logout-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav a.active {
+            background-color: var(--bg-color);
+        }
+
+        nav a:hover {
+            background-color: var(--bg-color);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .controls {
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+        }
+
+        button {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--bg-color);
+        }
+
+        .card-container {
+            position: relative;
+            margin-bottom: 2rem;
+            perspective: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Full width for better responsiveness */
+            max-width: 400px; /* Maximum width to maintain proportions */
+        }
+
+        .wood-stand {
+            background-color: var(--wood-color);
+            width: 100%; /* Make it responsive */
+            max-width: 400px; /* Maintain max width */
+            height: 36px; /* Increased by 20% from 30px */
+            border-radius: 4px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transform: perspective(500px) rotateX(5deg);
+            transform-origin: center bottom;
+            z-index: 1;
+        }
+
+        .wood-stand::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+            border-radius: 4px 4px 0 0;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 100%; /* Full width for better responsiveness */
+            max-width: 300px; /* Maintain max width */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-weight: 500;
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .card-date {
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            color: var(--text-color);
+            width: 150px;
+            text-align: right;
+        }
+
+        .ml-logo {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--accent-color);
+            letter-spacing: -1px;
+            display: block;
+            margin-left: 10px;
+        }
+
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .todo-circle {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: transparent;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .todo-circle.half {
+            background: linear-gradient(to right, var(--accent-color) 50%, transparent 50%);
+        }
+
+        .todo-circle.full {
+            background-color: var(--accent-color);
+        }
+
+        .todo-text {
+            flex: 1;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            font-size: 1rem;
+            padding: 0.25rem 0;
+            color: var(--text-color);
+        }
+
+        .archive-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .month-section {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .month-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .month-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .month-toggle {
+            margin-right: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .month-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .month-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .month-cards.collapsed {
+            max-height: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .screen {
+            display: none;
+            width: 100%; /* Full width */
+            align-items: center; /* Center contents */
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            background-color: var(--footer-bg);
+            margin-top: auto;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+        
+        .inspiration-text {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            opacity: 0.8;
+        }
+
+        /* Enhanced responsive styles */
+        @media (max-width: 768px) {
+            /* Adjust navigation for mobile */
+            nav ul {
+                gap: 0.6rem; /* Decreased gap for better fit on mobile */
+            }
+            
+            nav a {
+                padding: 0.5rem 0.6rem; /* Reduced horizontal padding */
+                font-size: 0.9rem;
+            }
+            
+            /* Adjust logo position to prevent overlap with navigation */
+            .logo {
+                position: absolute;
+                right: 0.6rem; /* Reduced right margin */
+                transform: translateY(-50%);
+            }
+            
+            .ml-logo {
+                font-size: 12px; /* Smaller font size on mobile */
+            }
+            
+            /* Adjust card and stand dimensions */
+            .card {
+                max-width: 100%;
+                width: calc(100% - 2rem); /* Account for padding */
+            }
+            
+            .wood-stand {
+                max-width: 90%;
+            }
+            
+            /* Adjust controls */
+            .controls {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .controls button {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Adjust archive layout */
+            .month-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Footer adjustments */
+            .inspiration-text {
+                position: static;
+                display: block;
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* Small tablets and large phones */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .card-container {
+                max-width: 380px;
+            }
+            
+            .wood-stand {
+                max-width: 380px;
+            }
+            
+            .month-cards {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" id="sidebar-close">&times;</button>
+        
+        <!-- Added sidebar navigation links with updated order -->
+        <div class="sidebar-nav">
+            <a href="#today" class="sidebar-nav-link" data-screen="today">Today</a>
+            <a href="#tomorrow" class="sidebar-nav-link" data-screen="tomorrow">Tomorrow</a>
+            <a href="#archive" class="sidebar-nav-link" data-screen="archive">Archive</a>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form">
+            <h2>Login to Your Account</h2>
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button class="auth-button" id="login-button">Login</button>
+            <p class="auth-toggle" id="show-register">Don't have an account? Register</p>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form" style="display: none;">
+            <h2>Create an Account</h2>
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" required>
+            </div>
+            <div class="form-group">
+                <label for="register-confirm-password">Confirm Password</label>
+                <input type="password" id="register-confirm-password" required>
+            </div>
+            <button class="auth-button" id="register-button">Register</button>
+            <p class="auth-toggle" id="show-login">Already have an account? Login</p>
+        </div>
+        
+        <!-- User Info (shown when logged in) -->
+        <div id="user-info" class="user-info">
+            <h2>Account</h2>
+            <p>Logged in as: <span id="user-email"></span></p>
+            <button class="logout-button" id="logout-button">Logout</button>
+            
+            <h2>Data Sync</h2>
+            <p>Your data is automatically synced to your account</p>
+            <button class="auth-button" id="sync-button">Force Sync Now</button>
+        </div>
+        
+        <!-- Night Mode Toggle -->
+        <div class="night-mode-toggle">
+            <label class="toggle-switch">
+                <input type="checkbox" id="night-mode-toggle">
+                <span class="toggle-slider">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12.3,4.9c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0L9.5,4.9L8.1,3.5C7.7,3.1,7.1,3.1,6.7,3.5S6.3,4.5,6.7,4.9l1.4,1.4L5.3,9.1c-0.4,0.4-0.4,1,0,1.4s1,0.4,1.4,0l1.4-1.4l1.4,1.4c0.4,0.4,1,0.4,1.4,0s0.4-1,0-1.4l-1.4-1.4L12.3,4.9z"/>
+                    </svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12,17c-2.8,0-5-2.2-5-5s2.2-5,5-5s5,2.2,5,5S14.8,17,12,17z M12,9c-1.7,0-3,1.3-3,3s1.3,3,3,3s3-1.3,3-3S13.7,9,12,9z"/>
+                        <path d="M12,4c0.6,0,1-0.4,1-1V1c0-0.6-0.4-1-1-1s-1,0.4-1,1v2C11,3.6,11.4,4,12,4z"/>
+                        <path d="M12,20c-0.6,0-1,0.4-1,1v2c0,0.6,0.4,1,1,1s1-0.4,1-1v-2C13,20.4,12.6,20,12,20z"/>
+                        <path d="M20,11h2c0.6,0,1,0.4,1,1s-0.4,1-1,1h-2c-0.6,0-1-0.4-1-1S19.4,11,20,11z"/>
+                        <path d="M1,11h2c0.6,0,1,0.4,1,1s-0.4,1-1,1H1c-0.6,0-1-0.4-1-1S0.4,11,1,11z"/>
+                    </svg>
+                </span>
+            </label>
+            <span class="toggle-label">Night Mode</span>
+        </div>
+    </div>
+    
+    <nav>
+        <a href="#" class="logo">
+            <!-- Updated SVG logo to just show the arrow -->
+            <svg class="logo-image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
+                <path d="M 10 25 L 80 25 M 80 25 L 65 10 M 80 25 L 65 40" stroke="#000" stroke-width="4" fill="none" />
+            </svg>
+            <span class="ml-logo">minimaLIST</span>
+        </a>
+        <button class="menu-button" id="menu-button">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul>
+            <li><a href="#archive" class="nav-link" data-screen="archive">Archive</a></li>
+            <li><a href="#today" class="nav-link active" data-screen="today">Today</a></li>
+            <li><a href="#tomorrow" class="nav-link" data-screen="tomorrow">Tomorrow</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Today Screen -->
+        <div id="today-screen" class="screen active">
+            <div class="card-container">
+                <div class="card" id="today-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Today</h2>
+                        <input type="text" class="card-date" placeholder="Date">
+                        <div class="menu-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                    <div class="todo-list" id="today-todos">
+                        <!-- Todo items will be generated here -->
+                    </div>
+                </div>
+                <div class="wood-stand"></div>
+            </div>
+            <div class="controls">
+                <button id="save-today">Save Card</button>
+                <button id="archive-today">Archive Card</button>
+                <button id="new-today">New Card</button>
+            </div>
+        </div>
+
+        <!-- Tomorrow Screen -->
+        <div id="tomorrow-screen" class="screen">
+            <div class="card-container">
+                <div class="card" id="tomorrow-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Tomorrow</h2>
+                        <input type="text" class="card-date" placeholder="">
+                        <div class="menu-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                    <div class="todo-list" id="tomorrow-todos">
+                        <!-- Todo items will be generated here -->
+                    </div>
+                </div>
+                <div class="wood-stand"></div>
+            </div>
+            <!-- Moved the controls below the card as requested -->
+            <div class="controls">
+                <button id="save-tomorrow">Save Card</button>
+                <button id="move-to-today">Move to Today</button>
+                <button id="new-tomorrow">New Card</button>
+            </div>
+        </div>
+
+        <!-- Archive Screen -->
+        <div id="archive-screen" class="screen">
+            <div class="archive-container" id="archive-container">
+                <!-- Archived cards will be displayed here -->
+            </div>
+            <div class="controls">
+                <button id="clear-archive">Clear Archive</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        minimaLIST © 2025
+        <div class="inspiration-text">Inspired by the Analog system by Ugmonk</div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            const screens = document.querySelectorAll('.screen');
+            
+            // Handle navigation from both main nav and sidebar
+            function navigateToScreen(screenId) {
+                // Update active nav link in main navigation
+                navLinks.forEach(l => {
+                    if (l.getAttribute('data-screen') === screenId) {
+                        l.classList.add('active');
+                    } else {
+                        l.classList.remove('active');
+                    }
+                });
+                
+                // Show corresponding screen
+                screens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                document.getElementById(`${screenId}-screen`).classList.add('active');
+                
+                // Close sidebar if open
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+            
+            // Add click handler for main navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const screenId = this.getAttribute('data-screen');
+                    navigateToScreen(screenId);
+                });
+            });
+            
+            // Add click handler for sidebar navigation
+            const sidebarNavLinks = document.querySelectorAll('.sidebar-nav-link');
+            sidebarNavLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const screenId = this.getAttribute('data-screen');
+                    navigateToScreen(screenId);
+                });
+            });
+
+            // Initialize todo lists
+            const todoLists = {
+                'today': document.getElementById('today-todos'),
+                'tomorrow': document.getElementById('tomorrow-todos')
+            };
+            
+            // Create todo items (10 for each list)
+            for (const listId in todoLists) {
+                const list = todoLists[listId];
+                for (let i = 0; i < 10; i++) {
+                    list.appendChild(createTodoItem());
+                }
+            }
+
+            // Save data in localStorage
+            function saveToLocalStorage() {
+                const todayData = {
+                    date: document.querySelector('#today-card .card-date').value,
+                    todos: Array.from(document.querySelectorAll('#today-todos .todo-item')).map(item => ({
+                        text: item.querySelector('.todo-text').value,
+                        status: item.querySelector('.todo-circle').classList.contains('full') ? 2 : 
+                                item.querySelector('.todo-circle').classList.contains('half') ? 1 : 0
+                    }))
+                };
+                
+                const tomorrowData = {
+                    date: document.querySelector('#tomorrow-card .card-date').value,
+                    todos: Array.from(document.querySelectorAll('#tomorrow-todos .todo-item')).map(item => ({
+                        text: item.querySelector('.todo-text').value,
+                        status: item.querySelector('.todo-circle').classList.contains('full') ? 2 : 
+                                item.querySelector('.todo-circle').classList.contains('half') ? 1 : 0
+                    }))
+                };
+                
+                localStorage.setItem('todayCard', JSON.stringify(todayData));
+                localStorage.setItem('tomorrowCard', JSON.stringify(tomorrowData));
+                
+                // Auto-sync if logged in
+                syncUserData();
+            }
+
+            // Load data from localStorage
+            function loadFromLocalStorage() {
+                const todayData = JSON.parse(localStorage.getItem('todayCard'));
+                const tomorrowData = JSON.parse(localStorage.getItem('tomorrowCard'));
+                
+                if (todayData) {
+                    document.querySelector('#today-card .card-date').value = todayData.date;
+                    const todayItems = document.querySelectorAll('#today-todos .todo-item');
+                    todayData.todos.forEach((todo, index) => {
+                        if (index < todayItems.length) {
+                            todayItems[index].querySelector('.todo-text').value = todo.text;
+                            const circle = todayItems[index].querySelector('.todo-circle');
+                            circle.classList.remove('half', 'full');
+                            if (todo.status === 1) circle.classList.add('half');
+                            if (todo.status === 2) circle.classList.add('full');
+                        }
+                    });
+                }
+                
+                if (tomorrowData) {
+                    document.querySelector('#tomorrow-card .card-date').value = tomorrowData.date;
+                    const tomorrowItems = document.querySelectorAll('#tomorrow-todos .todo-item');
+                    tomorrowData.todos.forEach((todo, index) => {
+                        if (index < tomorrowItems.length) {
+                            tomorrowItems[index].querySelector('.todo-text').value = todo.text;
+                            const circle = tomorrowItems[index].querySelector('.todo-circle');
+                            circle.classList.remove('half', 'full');
+                            if (todo.status === 1) circle.classList.add('half');
+                            if (todo.status === 2) circle.classList.add('full');
+                        }
+                    });
+                }
+                
+                // Load archive
+                loadArchive();
+            }
+
+            // Create a new todo item
+            function createTodoItem() {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                
+                const circle = document.createElement('div');
+                circle.className = 'todo-circle';
+                
+                // Add click functionality to circles
+                circle.addEventListener('click', function() {
+                    if (this.classList.contains('full')) {
+                        this.classList.remove('full');
+                        this.classList.remove('half');
+                    } else if (this.classList.contains('half')) {
+                        this.classList.remove('half');
+                        this.classList.add('full');
+                    } else {
+                        this.classList.add('half');
+                    }
+                    saveToLocalStorage();
+                });
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'todo-text';
+                input.placeholder = '';
+                input.addEventListener('change', saveToLocalStorage);
+                
+                todoItem.appendChild(circle);
+                todoItem.appendChild(input);
+                
+                return todoItem;
+            }
+
+            // Save button functionality
+            document.getElementById('save-today').addEventListener('click', function() {
+                saveToLocalStorage();
+                alert('Today card saved!');
+            });
+            
+            document.getElementById('save-tomorrow').addEventListener('click', function() {
+                saveToLocalStorage();
+                alert('Tomorrow card saved!');
+            });
+
+            // Archive functionality
+            document.getElementById('archive-today').addEventListener('click', function() {
+                const todayData = {
+                    date: document.querySelector('#today-card .card-date').value || new Date().toLocaleDateString(),
+                    todos: Array.from(document.querySelectorAll('#today-todos .todo-item')).map(item => ({
+                        text: item.querySelector('.todo-text').value,
+                        status: item.querySelector('.todo-circle').classList.contains('full') ? 2 : 
+                                item.querySelector('.todo-circle').classList.contains('half') ? 1 : 0
+                    })),
+                    archivedOn: new Date().toISOString()
+                };
+                
+                // Only archive if there are actual tasks
+                if (todayData.todos.some(todo => todo.text.trim() !== '')) {
+                    // Get existing archives
+                    let archives = JSON.parse(localStorage.getItem('archives')) || [];
+                    archives.push(todayData);
+                    localStorage.setItem('archives', JSON.stringify(archives));
+                    
+                    // Clear today card
+                    document.querySelector('#today-card .card-date').value = '';
+                    document.querySelectorAll('#today-todos .todo-item').forEach(item => {
+                        item.querySelector('.todo-text').value = '';
+                        item.querySelector('.todo-circle').classList.remove('half', 'full');
+                    });
+                    
+                    saveToLocalStorage();
+                    loadArchive();
+                    alert('Card archived!');
+                } else {
+                    alert('Cannot archive an empty card. Add at least one task.');
+                }
+            });
+
+            // Move to Today functionality
+            document.getElementById('move-to-today').addEventListener('click', function() {
+                const tomorrowItems = Array.from(document.querySelectorAll('#tomorrow-todos .todo-item'));
+                const todayItems = Array.from(document.querySelectorAll('#today-todos .todo-item'));
+                
+                // Check if there are tasks to move
+                const hasTasks = tomorrowItems.some(item => item.querySelector('.todo-text').value.trim() !== '');
+                
+                if (hasTasks) {
+                    // Replace today's tasks with tomorrow's tasks
+                    tomorrowItems.forEach((item, index) => {
+                        if (index < todayItems.length) {
+                            todayItems[index].querySelector('.todo-text').value = item.querySelector('.todo-text').value;
+                            
+                            const tomorrowCircle = item.querySelector('.todo-circle');
+                            const todayCircle = todayItems[index].querySelector('.todo-circle');
+                            
+                            todayCircle.classList.remove('half', 'full');
+                            if (tomorrowCircle.classList.contains('half')) todayCircle.classList.add('half');
+                            if (tomorrowCircle.classList.contains('full')) todayCircle.classList.add('full');
+                            
+                            // Clear tomorrow task
+                            item.querySelector('.todo-text').value = '';
+                            tomorrowCircle.classList.remove('half', 'full');
+                        }
+                    });
+                    
+                    // Also move the date if set
+                    const tomorrowDate = document.querySelector('#tomorrow-card .card-date').value;
+                    if (tomorrowDate) {
+                        document.querySelector('#today-card .card-date').value = tomorrowDate;
+                        document.querySelector('#tomorrow-card .card-date').value = '';
+                    }
+                    
+                    saveToLocalStorage();
+                    alert('Tasks moved to Today!');
+                } else {
+                    alert('No tasks to move.');
+                }
+            });
+
+            // New card functionality
+            document.getElementById('new-today').addEventListener('click', function() {
+                if (confirm('Create a new Today card? This will clear the current card.')) {
+                    document.querySelector('#today-card .card-date').value = '';
+                    document.querySelectorAll('#today-todos .todo-item').forEach(item => {
+                        item.querySelector('.todo-text').value = '';
+                        item.querySelector('.todo-circle').classList.remove('half', 'full');
+                    });
+                    saveToLocalStorage();
+                }
+            });
+            
+            document.getElementById('new-tomorrow').addEventListener('click', function() {
+                if (confirm('Create a new Tomorrow card? This will clear the current card.')) {
+                    document.querySelector('#tomorrow-card .card-date').value = '';
+                    document.querySelectorAll('#tomorrow-todos .todo-item').forEach(item => {
+                        item.querySelector('.todo-text').value = '';
+                        item.querySelector('.todo-circle').classList.remove('half', 'full');
+                    });
+                    saveToLocalStorage();
+                }
+            });
+            
+            // Load archives
+            function loadArchive() {
+                const archiveContainer = document.getElementById('archive-container');
+                archiveContainer.innerHTML = '';
+                
+                const archives = JSON.parse(localStorage.getItem('archives')) || [];
+                
+                if (archives.length === 0) {
+                    const emptyMessage = document.createElement('p');
+                    emptyMessage.textContent = 'No archived cards yet.';
+                    archiveContainer.appendChild(emptyMessage);
+                    return;
+                }
+                
+                // Sort archives by date (newest first)
+                archives.sort((a, b) => new Date(b.archivedOn) - new Date(a.archivedOn));
+                
+                // Group archives by month and year
+                const archivesByMonth = {};
+                
+                archives.forEach(archiveData => {
+                    const date = new Date(archiveData.archivedOn);
+                    const monthYear = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+                    
+                    if (!archivesByMonth[monthYear]) {
+                        archivesByMonth[monthYear] = [];
+                    }
+                    
+                    archivesByMonth[monthYear].push(archiveData);
+                });
+                
+                // Sort months in reverse chronological order
+                const sortedMonths = Object.keys(archivesByMonth).sort((a, b) => {
+                    const dateA = new Date(a);
+                    const dateB = new Date(b);
+                    return dateB - dateA;
+                });
+                
+                // Create sections for each month
+                sortedMonths.forEach(month => {
+                    const monthSection = document.createElement('div');
+                    monthSection.className = 'month-section';
+                    
+                    // Create month header with collapse toggle
+                    const monthHeader = document.createElement('div');
+                    monthHeader.className = 'month-header';
+                    
+                    const monthToggle = document.createElement('div');
+                    monthToggle.className = 'month-toggle';
+                    monthToggle.innerHTML = '&#9662;'; // Down triangle
+                    
+                    const monthTitle = document.createElement('h3');
+                    monthTitle.className = 'month-title';
+                    monthTitle.textContent = month;
+                    
+                    monthHeader.appendChild(monthToggle);
+                    monthHeader.appendChild(monthTitle);
+                    
+                    // Container for month's cards
+                    const monthCards = document.createElement('div');
+                    monthCards.className = 'month-cards';
+                    
+                    // Add toggle functionality
+                    monthHeader.addEventListener('click', () => {
+                        monthToggle.classList.toggle('collapsed');
+                        monthCards.classList.toggle('collapsed');
+                    });
+                    
+                    // Add cards for this month
+                    archivesByMonth[month].forEach(archiveData => {
+                        const cardContainer = createArchiveCard(archiveData);
+                        monthCards.appendChild(cardContainer);
+                    });
+                    
+                    monthSection.appendChild(monthHeader);
+                    monthSection.appendChild(monthCards);
+                    archiveContainer.appendChild(monthSection);
+                });
+            }
+            
+            // Helper function to create archive card
+            function createArchiveCard(archiveData) {
+                const cardContainer = document.createElement('div');
+                cardContainer.className = 'card-container';
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'card-header';
+                
+                const cardTitle = document.createElement('h2');
+                cardTitle.className = 'card-title';
+                cardTitle.textContent = 'Archived';
+                
+                const cardDate = document.createElement('div');
+                cardDate.className = 'card-date';
+                cardDate.textContent = archiveData.date;
+                
+                const menuDots = document.createElement('div');
+                menuDots.className = 'menu-dots';
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    menuDots.appendChild(dot);
+                }
+                
+                cardHeader.appendChild(cardTitle);
+                cardHeader.appendChild(cardDate);
+                cardHeader.appendChild(menuDots);
+                
+                const todoList = document.createElement('div');
+                todoList.className = 'todo-list';
+                
+                // Add only the tasks that have text
+                archiveData.todos.filter(todo => todo.text.trim() !== '').forEach(todo => {
+                    const todoItem = document.createElement('div');
+                    todoItem.className = 'todo-item';
+                    
+                    const circle = document.createElement('div');
+                    circle.className = 'todo-circle';
+                    if (todo.status === 1) circle.classList.add('half');
+                    if (todo.status === 2) circle.classList.add('full');
+                    
+                    const text = document.createElement('div');
+                    text.className = 'todo-text';
+                    text.textContent = todo.text;
+                    
+                    todoItem.appendChild(circle);
+                    todoItem.appendChild(text);
+                    todoList.appendChild(todoItem);
+                });
+                
+                card.appendChild(cardHeader);
+                card.appendChild(todoList);
+                
+                const woodStand = document.createElement('div');
+                woodStand.className = 'wood-stand';
+                
+                // Add slight random rotation to archived cards for natural look
+                card.style.transform = `rotate(${Math.random() * 4 - 2}deg)`;
+                
+                cardContainer.appendChild(card);
+                cardContainer.appendChild(woodStand);
+                
+                return cardContainer;
+            }
+
+            // Clear archive
+            document.getElementById('clear-archive').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all archived cards? This cannot be undone.')) {
+                    localStorage.removeItem('archives');
+                    loadArchive();
+                    alert('Archive cleared!');
+                }
+            });
+            
+            // Sidebar functionality
+            const menuButton = document.getElementById('menu-button');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const sidebarClose = document.getElementById('sidebar-close');
+            
+            // Form elements
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const userInfo = document.getElementById('user-info');
+            const showRegister = document.getElementById('show-register');
+            const showLogin = document.getElementById('show-login');
+            
+            // Buttons
+            const loginButton = document.getElementById('login-button');
+            const registerButton = document.getElementById('register-button');
+            const logoutButton = document.getElementById('logout-button');
+            const syncButton = document.getElementById('sync-button');
+            
+            // Toggle sidebar
+            menuButton.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            // Switch between login and register
+            showRegister.addEventListener('click', function() {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+            
+            showLogin.addEventListener('click', function() {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+            });
+            
+            // Check if user is logged in
+            function checkAuth() {
+                const user = localStorage.getItem('currentUser');
+                if (user) {
+                    const userData = JSON.parse(user);
+                    document.getElementById('user-email').textContent = userData.email;
+                    loginForm.style.display = 'none';
+                    registerForm.style.display = 'none';
+                    userInfo.classList.add('active');
+                } else {
+                    loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                    userInfo.classList.remove('active');
+                }
+            }
+            
+            // Login handling - Modified to ensure consistent functionality across devices
+            loginButton.addEventListener('click', function() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    alert('Please enter both email and password');
+                    return;
+                }
+                
+                // Get users from storage - ensuring we properly parse the data
+                let users = [];
+                try {
+                    const usersData = localStorage.getItem('users');
+                    if (usersData) {
+                        users = JSON.parse(usersData);
+                    }
+                } catch (e) {
+                    console.error('Error parsing users data:', e);
+                    users = [];
+                }
+                
+                // Find user with matching credentials
+                const user = users.find(u => u && u.email === email && u.password === password);
+                
+                if (user) {
+                    // Save current user - ensuring we stringify properly
+                    try {
+                        localStorage.setItem('currentUser', JSON.stringify({
+                            email: user.email,
+                            id: user.id
+                        }));
+                        
+                        // Load user data if available
+                        if (user.data) {
+                            // Use try/catch to handle potential JSON parsing issues
+                            try {
+                                localStorage.setItem('todayCard', user.data.todayCard || '{}');
+                                localStorage.setItem('tomorrowCard', user.data.tomorrowCard || '{}');
+                                localStorage.setItem('archives', user.data.archives || '[]');
+                                loadFromLocalStorage();
+                            } catch (e) {
+                                console.error('Error loading user data:', e);
+                            }
+                        }
+                        
+                        checkAuth();
+                        alert('Logged in successfully!');
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    } catch (e) {
+                        console.error('Error saving user session:', e);
+                        alert('An error occurred while logging in. Please try again.');
+                    }
+                } else {
+                    alert('Invalid email or password');
+                }
+            });
+            
+            // Register handling - Enhanced to ensure consistent functionality
+            registerButton.addEventListener('click', function() {
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                
+                if (!email || !password || !confirmPassword) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                // Get users from storage with error handling
+                let users = [];
+                try {
+                    const usersData = localStorage.getItem('users');
+                    if (usersData) {
+                        users = JSON.parse(usersData);
+                    }
+                } catch (e) {
+                    console.error('Error parsing users data:', e);
+                    users = [];
+                }
+                
+                // Ensure users is an array
+                if (!Array.isArray(users)) {
+                    users = [];
+                }
+                
+                // Check if user already exists
+                if (users.some(u => u && u.email === email)) {
+                    alert('User with this email already exists');
+                    return;
+                }
+                
+                // Create new user with current data
+                const newUser = {
+                    id: Date.now().toString(),
+                    email,
+                    password,
+                    data: {
+                        todayCard: localStorage.getItem('todayCard') || '{}',
+                        tomorrowCard: localStorage.getItem('tomorrowCard') || '{}',
+                        archives: localStorage.getItem('archives') || '[]'
+                    }
+                };
+                
+                try {
+                    users.push(newUser);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    
+                    // Save current user
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        email: newUser.email,
+                        id: newUser.id
+                    }));
+                    
+                    checkAuth();
+                    alert('Account created successfully!');
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                } catch (e) {
+                    console.error('Error saving user data:', e);
+                    alert('An error occurred while creating your account. Please try again.');
+                }
+            });
+            
+            // Logout handling
+            logoutButton.addEventListener('click', function() {
+                // Save user data before logout
+                syncUserData();
+                
+                // Clear current user
+                localStorage.removeItem('currentUser');
+                
+                // Clear inputs
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-password').value = '';
+                document.getElementById('register-confirm-password').value = '';
+                
+                checkAuth();
+                alert('Logged out successfully!');
+            });
+            
+            // Sync data - Enhanced with error handling
+            syncButton.addEventListener('click', function() {
+                if (syncUserData()) {
+                    alert('Data synced successfully!');
+                } else {
+                    alert('You need to be logged in to sync data');
+                }
+            });
+            
+            function syncUserData() {
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    return false;
+                }
+                
+                try {
+                    const userData = JSON.parse(currentUser);
+                    let users = [];
+                    
+                    try {
+                        const usersData = localStorage.getItem('users');
+                        if (usersData) {
+                            users = JSON.parse(usersData);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing users data:', e);
+                        return false;
+                    }
+                    
+                    const userIndex = users.findIndex(u => u && u.id === userData.id);
+                    
+                    if (userIndex !== -1) {
+                        users[userIndex].data = {
+                            todayCard: localStorage.getItem('todayCard') || '{}',
+                            tomorrowCard: localStorage.getItem('tomorrowCard') || '{}',
+                            archives: localStorage.getItem('archives') || '[]'
+                        };
+                        
+                        localStorage.setItem('users', JSON.stringify(users));
+                        return true;
+                    }
+                } catch (e) {
+                    console.error('Error syncing user data:', e);
+                }
+                
+                return false;
+            }
+            
+            // Check auth on load
+            checkAuth();
+            
+            // Night mode functionality
+            const nightModeToggle = document.getElementById('night-mode-toggle');
+            
+            // Check if night mode is saved in localStorage
+            if (localStorage.getItem('nightMode') === 'true') {
+                document.body.classList.add('night-mode');
+                nightModeToggle.checked = true;
+            }
+            
+            // Toggle night mode
+            nightModeToggle.addEventListener('change', function() {
+                document.body.classList.toggle('night-mode');
+                localStorage.setItem('nightMode', this.checked);
+            });
+            
+            // Initially set today's date on load
+            if (!document.querySelector('#today-card .card-date').value) {
+                const today = new Date().toLocaleDateString();
+                document.querySelector('#today-card .card-date').value = today;
+            }
+
+            // Load saved data
+            loadFromLocalStorage();
+        });
+    </script>
+</body>
+</html>
